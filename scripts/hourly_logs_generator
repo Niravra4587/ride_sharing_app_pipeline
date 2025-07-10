@@ -1,0 +1,63 @@
+import csv
+import random
+from datetime import datetime, timedelta
+from faker import Faker
+from mimesis import Address
+
+fake = Faker()
+address_gen = Address()
+
+statuses = ["completed", "cancelled", "in_progress"]
+total_records = random.randint(1000, 2000)  # Total number of simulated trips
+hours_back = 24
+
+def generate_hourly_rides():
+    rides = []
+    now = datetime.now()
+    records_per_hour = total_records // hours_back
+
+    trip_id_counter = 0
+
+    for hour_offset in range(hours_back):
+        base_time = now - timedelta(hours=hour_offset)
+        for _ in range(records_per_hour):
+            pickup_time = base_time.replace(minute=random.randint(0, 59), second=random.randint(0, 59))
+            dropoff_time = pickup_time + timedelta(minutes=random.randint(5, 60))
+
+
+            pickup_location = address_gen.address().replace("\n", ", ")
+            if random.random() < 0.05:
+                pickup_location = None
+
+            dropoff_location = address_gen.address().replace("\n", ", ")
+            if random.random() < 0.05:
+                dropoff_location = None
+
+            fare = round(random.uniform(5, 50), 2) if random.random() > 0.05 else None
+            status = "completed" if fare and random.random() > 0.1 else random.choice(statuses)
+
+            ride = {
+                "trip_id": f"trip_{trip_id_counter}",
+                "driver_id": f"driver_{random.randint(1, 50)}",
+                "pickup_time": pickup_time.strftime('%Y-%m-%d %H:%M:%S'),
+                "dropoff_time": dropoff_time.strftime('%Y-%m-%d %H:%M:%S'),
+                "pickup_location": pickup_location,
+                "dropoff_location": dropoff_location,
+                "fare_amount": fare,
+                "status": status
+            }
+            rides.append(ride)
+            trip_id_counter += 1
+
+    return rides
+
+
+def export_to_csv(filename="inputs/hourly_rides.csv", n=2000):
+    rides = generate_hourly_rides()
+    with open(filename, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=rides[0].keys())
+        writer.writeheader()
+        writer.writerows(rides)
+    print(f"Generated {len(rides)} ride logs to {filename}")
+
+export_to_csv()
