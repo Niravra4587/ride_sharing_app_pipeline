@@ -3,7 +3,7 @@
 A simplified ride-sharing analytics pipeline built using Python to simulate both **batch** and **streaming** data ingestion and processing. This project uses realistic mock data to compute insights like hourly trends and rolling metrics.
 
 ---
-## ER Diagram
+## Database Diagram
 <img width="1169" height="668" alt="image" src="https://github.com/user-attachments/assets/8a180962-94fc-417e-a3ee-249d047d1e3a" />
 
 ## Architecture Diagram
